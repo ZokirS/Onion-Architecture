@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "Onion_Architecture": {
+    "CompanyEmployees": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
