@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Design;
 using Repository;
 
-namespace Onion_Architecture.ContextFactory
+namespace CompanyEmployees.ContextFactory
 {
     public class RepositoryContextFactory : IDesignTimeDbContextFactory<RepositoryContext>
     {
@@ -15,9 +15,10 @@ namespace Onion_Architecture.ContextFactory
 
             var builder = new DbContextOptionsBuilder<RepositoryContext>()
                 .UseSqlServer(configuration.GetConnectionString("sqlConnection"),
-                b => b.MigrationsAssembly("Onion Architecture"));
+                b => b.MigrationsAssembly("CompanyEmployees"));
 
             return new RepositoryContext(builder.Options);
         }
+
     }
 }
