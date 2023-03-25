@@ -1,10 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace Repository
 {
@@ -22,7 +18,7 @@ namespace Repository
 
 
 
-        public IQueryable<T> FindByCondition(System.Linq.Expressions.Expression<Func<T, bool>> expression, bool trackChanges)
+        public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression, bool trackChanges)
         => !trackChanges ?
             RepositoryContext.Set<T>()
             .Where(expression)
