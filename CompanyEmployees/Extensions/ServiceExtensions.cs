@@ -4,6 +4,7 @@ using Repository;
 using Service.Contracts;
 using Service;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace CompanyEmployees.Extensions
 {
@@ -33,5 +34,8 @@ namespace CompanyEmployees.Extensions
 
         public static void ConfigureServiceManager(this IServiceCollection services) =>
             services.AddScoped<IServiceManager, ServiceManager>();
+
+        public static IMvcBuilder AddCustomCsvFotmatter(this IMvcBuilder builder)=>
+            builder.AddMvcOptions(config=>config.OutputFormatters.Add(new CsvOutputFormatter()));
     }
 }
