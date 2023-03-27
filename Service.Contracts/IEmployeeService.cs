@@ -7,5 +7,6 @@ namespace Service.Contracts
         IEnumerable<EmployeeDto> GetEmployees(Guid companyId, bool trackChanges);
         EmployeeDto GetEmployee(Guid companyId, Guid id, bool trackChanges);
         EmployeeDto CreateEmployee(Guid companyId, EmployeeForCreationDto employee, bool trackChanges);
+        void DeleteEmployeeForCompany(Guid companyId, Guid id, bool trackChanges);
     }
 }
