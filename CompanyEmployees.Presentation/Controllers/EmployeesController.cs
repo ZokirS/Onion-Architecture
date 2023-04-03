@@ -1,8 +1,10 @@
 ﻿using CompanyEmployees.Presentation.ActionFilters;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using Service.Contracts;
 using Shared.DataTransferObjects;
+using Shared.RequestFeatures;
 
 namespace CompanyEmployees.Presentation.Controllers
 {
@@ -14,12 +16,17 @@ namespace CompanyEmployees.Presentation.Controllers
 
         public EmployeesController(IServiceManager service) => _service = service;
 
-        [HttpGet]
-        public async Task<IActionResult> GetEmployeesForCompany(Guid companyId)
-        {
-            var employees = await _service.EmployeeService.GetEmployeesAsync(companyId, false);
 
-            return Ok(employees);
+        [HttpGet]
+        public async Task<IActionResult> GetEmployeeForCompany(Guid companyId,
+            [FromQuery] EmployeeParameters employeeParameters)
+        {
+            var pagedResult = await _service.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
+
+            Response.Headers.Add("X-Pagination",
+                                 JsonSerializer.Serialize(pagedResult.metaData));
+
+            return Ok(pagedResult.employees);
         }
 
         [HttpGet("{id:guid}", Name = "GetEmployeeForCompany")]
@@ -52,23 +59,24 @@ namespace CompanyEmployees.Presentation.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{id:guid}")] 
+        [HttpPatch("{id:guid}")]
         public async Task<IActionResult> PartiallyUpdateEmployeeForCompany(Guid companyId, Guid id,
-            [FromBody] JsonPatchDocument<EmployeeForUpdateDto> patchDoc) 
+            [FromBody] JsonPatchDocument<EmployeeForUpdateDto> patchDoc)
         {
-            if (patchDoc is null) 
+            if (patchDoc is null)
                 return BadRequest("patchDoc object sent from client is null.");
-            
-            var result = await _service.EmployeeService.GetEmployeeForPatchAsync(companyId, id, compTrackChanges: false, empTrackChanges: true); 
-            
+
+            var result = await _service.EmployeeService.GetEmployeeForPatchAsync(companyId, id, compTrackChanges: false, empTrackChanges: true);
+
             patchDoc.ApplyTo(result.employeeToPatch, ModelState);
 
             TryValidateModel(result.employeeToPatch);
             if (!ModelState.IsValid)
                 return UnprocessableEntity(ModelState);
-            
-            await _service.EmployeeService.SaveChangesForPatchAsync(result.employeeToPatch, result.employeeEntity); 
-            
-            return NoContent(); }
+
+            await _service.EmployeeService.SaveChangesForPatchAsync(result.employeeToPatch, result.employeeEntity);
+
+            return NoContent();
+        }
     }
 }
