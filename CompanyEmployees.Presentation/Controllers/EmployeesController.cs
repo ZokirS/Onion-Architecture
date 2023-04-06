@@ -5,6 +5,7 @@ using System.Text.Json;
 using Service.Contracts;
 using Shared.DataTransferObjects;
 using Shared.RequestFeatures;
+using Entities.LinkModels;
 
 namespace CompanyEmployees.Presentation.Controllers
 {
@@ -18,15 +19,20 @@ namespace CompanyEmployees.Presentation.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetEmployeeForCompany(Guid companyId,
+        [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
+        public async Task<IActionResult> GetEmployeesForCompany(Guid companyId,
             [FromQuery] EmployeeParameters employeeParameters)
         {
-            var pagedResult = await _service.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
+            var linkParams = new LinkParameters(employeeParameters, HttpContext);
+
+            var result = await _service.EmployeeService.GetEmployeesAsync(companyId,
+                linkParams, trackChanges: false);
 
             Response.Headers.Add("X-Pagination",
-                                 JsonSerializer.Serialize(pagedResult.metaData));
+                                 JsonSerializer.Serialize(result.metaData));
 
-            return Ok(pagedResult.employees);
+            return result.linkResponse.HasLinks ? Ok(result.linkResponse.LinkedEntities) :
+                Ok(result.linkResponse.ShapedEntities);
         }
 
         [HttpGet("{id:guid}", Name = "GetEmployeeForCompany")]
@@ -45,7 +51,7 @@ namespace CompanyEmployees.Presentation.Controllers
             return CreatedAtRoute("GetEmployeeForCompany", new { companyId, id = employeeToRetun.id }, employeeToRetun);
         }
         [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> DeleteEmployee(Guid companyId, Guid id)
+        public async Task<IActionResult> DeleteEmployeeForCompany(Guid companyId, Guid id)
         {
             await _service.EmployeeService.DeleteEmployeeForCompanyAsync(companyId, id, trackChanges: false);
             return NoContent();
