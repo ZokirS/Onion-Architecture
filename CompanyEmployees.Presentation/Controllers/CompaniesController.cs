@@ -6,7 +6,8 @@ using Shared.DataTransferObjects;
 
 namespace CompanyEmployees.Presentation.Controllers
 {
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/companies")]
     [ApiController]
     public class CompaniesController : ControllerBase
     {

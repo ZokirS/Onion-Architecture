@@ -43,6 +43,8 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 });
 builder.Services.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.ConfigureVersioning();
+
 
 
 
