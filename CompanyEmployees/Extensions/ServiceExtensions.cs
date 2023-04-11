@@ -25,8 +25,8 @@ namespace CompanyEmployees.Extensions
         public static void ConfigureIISIntegration(this IServiceCollection services) =>
             services.Configure<IISOptions>(options => { });
 
-         public static void ConfigureLoggerService(this IServiceCollection services) =>
-           services.AddSingleton<ILoggerManager, LoggerManager>();
+        public static void ConfigureLoggerService(this IServiceCollection services) =>
+          services.AddSingleton<ILoggerManager, LoggerManager>();
 
         public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration)
             => services.AddDbContext<RepositoryContext>(opts =>
@@ -38,8 +38,8 @@ namespace CompanyEmployees.Extensions
         public static void ConfigureServiceManager(this IServiceCollection services) =>
             services.AddScoped<IServiceManager, ServiceManager>();
 
-        public static IMvcBuilder AddCustomCsvFotmatter(this IMvcBuilder builder)=>
-            builder.AddMvcOptions(config=>config.OutputFormatters.Add(new CsvOutputFormatter()));
+        public static IMvcBuilder AddCustomCsvFotmatter(this IMvcBuilder builder) =>
+            builder.AddMvcOptions(config => config.OutputFormatters.Add(new CsvOutputFormatter()));
 
         public static void AddCustomMediaTypes(this IServiceCollection services)
         {
@@ -66,7 +66,7 @@ namespace CompanyEmployees.Extensions
                     xmlOutputFormatter.SupportedMediaTypes
                     .Add("application/vnd.zokir.apiroot+xml");
                 }
-                    
+
             });
         }
 
@@ -80,5 +80,19 @@ namespace CompanyEmployees.Extensions
                 config.ApiVersionReader = new HeaderApiVersionReader("api-version");
             });
         }
+
+        public static void ConfigureResponseCashing(this IServiceCollection services) =>
+            services.AddResponseCaching();
+
+        public static void ConfigureHttpCacheHeaders(this IServiceCollection services) =>
+            services.AddHttpCacheHeaders((expirationOpt) =>
+            {
+                expirationOpt.MaxAge = 65;
+                expirationOpt.CacheLocation = Marvin.Cache.Headers.CacheLocation.Private;
+            },
+            (validationOpt) =>
+            {
+                validationOpt.MustRevalidate = true;
+            });
     }
 }

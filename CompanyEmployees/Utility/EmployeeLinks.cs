@@ -1,8 +1,6 @@
-﻿using AutoMapper.Configuration.Conventions;
-using Contracts;
+﻿using Contracts;
 using Entities.LinkModels;
 using Entities.Models;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
 using Shared.DataTransferObjects;
 
