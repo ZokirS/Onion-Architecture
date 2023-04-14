@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 
 namespace CompanyEmployees.Presentation.Controllers
 {
-    [ApiVersion("2.0")]
     [Route("api/companies")]
     [ApiController]
+    [ApiExplorerSettings(GroupName = "v2")]
+    [ApiVersion("2.0")]
     public class CompaniesV2Controller : ControllerBase
     {
         private readonly IServiceManager _serviceManager;
@@ -13,6 +15,7 @@ namespace CompanyEmployees.Presentation.Controllers
         public CompaniesV2Controller(IServiceManager serviceManager) => _serviceManager = serviceManager;
 
         [HttpGet]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> GetCompanies()
         {
             var companies = await _serviceManager.CompanyService

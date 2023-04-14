@@ -25,15 +25,6 @@ LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nl
 builder.Services.AddScoped<ValidationFilterAttribute>();
 builder.Services.AddScoped<ValidateMediaTypeAttribute>();
 builder.Services.AddScoped<IEmployeeLinks, EmployeeLinks>();
-builder.Services.AddControllers(config =>
-{
-    config.RespectBrowserAcceptHeader = true;
-    config.ReturnHttpNotAcceptable = true;
-    config.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
-    config.CacheProfiles.Add("120SecondsDuration", new CacheProfile { Duration = 120 });
-}).AddXmlDataContractSerializerFormatters()
-  .AddCustomCsvFotmatter()
-  .AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
 builder.Services.AddCustomMediaTypes();
 builder.Services.ConfigureCors();
 builder.Services.ConfigureIISIntegration();
@@ -57,6 +48,17 @@ builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity();
 builder.Services.ConfigureJWT(builder.Configuration);
 builder.Services.AddJwtConfiguration(builder.Configuration);
+builder.Services.ConfigureSwagger();
+
+builder.Services.AddControllers(config =>
+{
+    config.RespectBrowserAcceptHeader = true;
+    config.ReturnHttpNotAcceptable = true;
+    config.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
+    config.CacheProfiles.Add("120SecondsDuration", new CacheProfile { Duration = 120 });
+}).AddXmlDataContractSerializerFormatters()
+  .AddCustomCsvFotmatter()
+  .AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
 #endregion
 
 
@@ -70,6 +72,12 @@ if(app.Environment.IsProduction())
     app.UseHsts();
 
 // Configure the HTTP request pipeline.
+app.UseSwagger();
+app.UseSwaggerUI(s =>
+{
+    s.SwaggerEndpoint("/swagger/v1/swagger.json", "Company Eployees API v1");
+    s.SwaggerEndpoint("/swagger/v2/swagger.json", "Company Eployees API v2");
+});
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.All }); 
