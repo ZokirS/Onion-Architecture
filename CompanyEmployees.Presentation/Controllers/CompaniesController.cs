@@ -9,9 +9,9 @@ using Shared.DataTransferObjects;
 namespace CompanyEmployees.Presentation.Controllers
 {
     [Route("api/companies")]
-    [ApiController]
-    [ApiExplorerSettings(GroupName = "v1")]
     [ApiVersion("1.0")]
+    [ApiExplorerSettings(GroupName = "v1")]
+    [ApiController]
     //[ResponseCache(CacheProfileName = "120SecondsDuration")]
     public class CompaniesController : ControllerBase
     {
@@ -21,6 +21,11 @@ namespace CompanyEmployees.Presentation.Controllers
         {
             _service = service;
         }
+
+        /// <summary>
+        /// Gets the list of all companies
+        /// </summary>
+        /// <returns></returns>
 
         [HttpGet(Name = "GetCompanies")]
         [Authorize(Roles = "Manager")]

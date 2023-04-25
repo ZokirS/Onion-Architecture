@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Entities.ConfigurationModels;
+using System.ComponentModel;
 
 namespace CompanyEmployees.Extensions
 {
@@ -26,7 +27,8 @@ namespace CompanyEmployees.Extensions
                 options.AddPolicy("CorsPolicy", builder =>
                 builder.AllowAnyOrigin()
                 .AllowAnyMethod()
-                .AllowAnyHeader());
+                .AllowAnyHeader()
+                .WithExposedHeaders("X-Pagination"));
             });
 
         public static void ConfigureIISIntegration(this IServiceCollection services) =>
@@ -140,6 +142,7 @@ namespace CompanyEmployees.Extensions
         {
             var jwtConfiguration = new JwtConfiguration();
             configuration.Bind(jwtConfiguration.Section, jwtConfiguration);
+
             var secretKey = "this is my custom Secret key for authentication";
 
             services.AddAuthentication(opt =>
@@ -147,33 +150,52 @@ namespace CompanyEmployees.Extensions
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-                .AddJwtBearer(options =>
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
 
-                        ValidIssuer = jwtConfiguration.ValidIssuer,
-                        ValidAudience = jwtConfiguration.ValidAudience,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
-                    };
-                });
+                    ValidIssuer = jwtConfiguration.ValidIssuer,
+                    ValidAudience = jwtConfiguration.ValidAudience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                };
+            });
         }
 
-        public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.Configure<JwtConfiguration>("JwtSettings", configuration.GetSection("JwtSettings"));
-        }
+        public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration) =>
+         services.Configure<JwtConfiguration>(configuration.GetSection("JwtSettings"));
 
         public static void ConfigureSwagger(this IServiceCollection services)
         {
             services.AddSwaggerGen(s =>
             {
-                s.SwaggerDoc("v1", new OpenApiInfo { Title = "Company Eployees API", Version = "v1" }); 
+                s.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Company Eployees API",
+                    Version = "v1",
+                    Description = "CompanyEmployees API by CodeMaze",
+                    TermsOfService = new Uri("https://example.com/terms"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "John Doe",
+                        Email = "John.Doe@gmail.com",
+                        Url = new Uri("https://twitter.com/johndoe"),
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "CompanyEmployees API LICX",
+                        Url = new Uri("https://example.com/license"),
+                    }
+                });
                 s.SwaggerDoc("v2", new OpenApiInfo { Title = "Company Eployees API", Version = "v2" });
+
+                var xmlFile = $"{typeof(Presentation.AssemblyReference).Assembly.GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                s.IncludeXmlComments(xmlPath);
 
                 s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {

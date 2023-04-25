@@ -13,12 +13,6 @@ using Shared.DataTransferObjects;
 
 var builder = WebApplication.CreateBuilder(args);
 
-static NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter() => 
-    new ServiceCollection().AddLogging().AddMvc().AddNewtonsoftJson()
-    .Services.BuildServiceProvider()
-    .GetRequiredService<IOptions<MvcOptions>>().Value
-    .InputFormatters.OfType<NewtonsoftJsonPatchInputFormatter>().First();
-
 LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 
 #region services
@@ -46,8 +40,8 @@ builder.Services.ConfigureRateLimitOptions();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity();
-builder.Services.ConfigureJWT(builder.Configuration);
 builder.Services.AddJwtConfiguration(builder.Configuration);
+builder.Services.ConfigureJWT(builder.Configuration);
 builder.Services.ConfigureSwagger();
 
 builder.Services.AddControllers(config =>
@@ -89,3 +83,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+static NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter() =>
+    new ServiceCollection().AddLogging().AddMvc().AddNewtonsoftJson()
+    .Services.BuildServiceProvider()
+    .GetRequiredService<IOptions<MvcOptions>>().Value
+    .InputFormatters.OfType<NewtonsoftJsonPatchInputFormatter>().First();

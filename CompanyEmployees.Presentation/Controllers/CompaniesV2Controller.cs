@@ -5,9 +5,9 @@ using Service.Contracts;
 namespace CompanyEmployees.Presentation.Controllers
 {
     [Route("api/companies")]
-    [ApiController]
-    [ApiExplorerSettings(GroupName = "v2")]
     [ApiVersion("2.0")]
+    [ApiExplorerSettings(GroupName = "v2")]
+    [ApiController]
     public class CompaniesV2Controller : ControllerBase
     {
         private readonly IServiceManager _serviceManager;

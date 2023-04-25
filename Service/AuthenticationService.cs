@@ -33,7 +33,7 @@ namespace Service
             _mapper = mapper;
             _userManager = userManager;
             _configuration = configuration;
-            _jwtConfiguration = new JwtConfiguration();
+            _jwtConfiguration = _configuration.Value;
         }
 
         public async Task<IdentityResult> RegisterUser(UserForRegistrationDto userForRegistrationDto)
@@ -81,8 +81,7 @@ namespace Service
 
         private SigningCredentials GetSigningCredentials()
         {
-            var key = Encoding.UTF8.GetBytes(_key);
-            var secret = new SymmetricSecurityKey(key);
+            var secret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));
 
             return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
         }
