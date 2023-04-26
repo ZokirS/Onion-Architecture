@@ -145,6 +145,8 @@ namespace CompanyEmployees.Extensions
 
             var secretKey = Environment.GetEnvironmentVariable("SECRET");
 
+            var key = "this is my Secret key for  Company Employees";
+
             services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -161,7 +163,7 @@ namespace CompanyEmployees.Extensions
 
                     ValidIssuer = jwtConfiguration.ValidIssuer,
                     ValidAudience = jwtConfiguration.ValidAudience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
                 };
             });
         }

@@ -8,14 +8,14 @@ namespace Repository
     {
         public CompanyRepository(RepositoryContext repositoryContext) : base(repositoryContext) {}
 
-        public async Task<IEnumerable<Company>> GetAllCompaniesAsync(bool trackChanges) =>
-            await FindAll(trackChanges)
+        public  IEnumerable<Company> GetAllCompanies(bool trackChanges) =>
+             FindAll(trackChanges)
             .OrderBy(c => c.Name)
-            .ToListAsync();
+            .ToList();
 
-        public async Task<Company> GetCompanyAsync(Guid companyId, bool trackChanges) =>
-            await FindByCondition(c => c.Id.Equals(companyId), trackChanges)
-            .SingleOrDefaultAsync();
+        public  Company GetCompany(Guid companyId, bool trackChanges) =>
+             FindByCondition(c => c.Id.Equals(companyId), trackChanges)
+            .SingleOrDefault();
 
         public void CreateCompany(Company company) => Create(company);
 

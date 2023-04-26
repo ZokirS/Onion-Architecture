@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using CompanyEmployees.Presentation.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Service.Contracts;
+using Shared.DataTransferObjects;
+using System.Security.Cryptography.X509Certificates;
 
 namespace CompanyEmployees.Presentation.Controllers
 {
@@ -16,14 +20,14 @@ namespace CompanyEmployees.Presentation.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> GetCompanies()
+        public  IActionResult GetCompanies()
         {
-            var companies = await _serviceManager.CompanyService
-                .GetAllCompaniesAsync(false);
+            var baseResult =  _serviceManager.CompanyService
+            .GetAllCompanies(false);
 
-            var comp2 = companies.Select(x => $"{x.Name}");
+            var companies = baseResult.GetResult<IEnumerable<CompanyDto>>().Select(x=>$"{x.Name}");
 
-            return Ok(comp2);
+            return Ok(companies);
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using CompanyEmployees.Presentation.ActionFilters;
+using CompanyEmployees.Presentation.Extensions;
 using CompanyEmployees.Presentation.ModelBinders;
+using Entities.Responses;
 using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +15,7 @@ namespace CompanyEmployees.Presentation.Controllers
     [ApiExplorerSettings(GroupName = "v1")]
     [ApiController]
     //[ResponseCache(CacheProfileName = "120SecondsDuration")]
-    public class CompaniesController : ControllerBase
+    public class CompaniesController : ApiControllerBase
     {
         private readonly IServiceManager _service;
 
@@ -29,18 +31,23 @@ namespace CompanyEmployees.Presentation.Controllers
 
         [HttpGet(Name = "GetCompanies")]
         [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> GetCompanies()
+        public  IActionResult GetCompanies()
         {
-            var companies = await _service.CompanyService.GetAllCompaniesAsync(trackChanges: false);
-                return Ok(companies);
+            var baseResult = _service.CompanyService.GetAllCompanies(trackChanges: false);
+            var companies = baseResult.GetResult<IEnumerable<CompanyDto>>();
+            return Ok(companies);
         }
 
         [HttpGet("{id:guid}", Name = "CompanyById")]
         [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
         [HttpCacheValidation(MustRevalidate =false)]
-        public async Task<IActionResult> GetCompany(Guid id)
+        public  IActionResult GetCompany(Guid id)
         {
-            var company = await _service.CompanyService.GetCompanyAsync(id, false);
+            var baseResult =  _service.CompanyService.GetCompany(id, false);
+            if(!baseResult.Success)
+                return ProccessError(baseResult);
+
+            var company = baseResult.GetResult<CompanyDto>();
             return Ok(company);
         }
 

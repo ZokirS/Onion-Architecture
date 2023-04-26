@@ -25,6 +25,7 @@ namespace Service
         private readonly JwtConfiguration _jwtConfiguration;
 
         private string _key = Environment.GetEnvironmentVariable("SECRET");
+        string key = "this is my Secret key for  Company Employees";
         private User? _user;
         public AuthenticationService(ILoggerManager logger, IMapper mapper,
             UserManager<User> userManager, IOptions<JwtConfiguration> configuration)
@@ -81,7 +82,7 @@ namespace Service
 
         private SigningCredentials GetSigningCredentials()
         {
-            var secret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));
+            var secret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
 
             return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
         }
@@ -131,7 +132,7 @@ namespace Service
                 ValidateAudience = true,
                 ValidateIssuer = true,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key)),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
                 ValidateLifetime = true,
                 ValidIssuer = _jwtConfiguration.ValidIssuer,
                 ValidAudience = _jwtConfiguration.ValidAudience
