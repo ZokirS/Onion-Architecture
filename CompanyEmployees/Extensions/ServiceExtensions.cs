@@ -143,7 +143,7 @@ namespace CompanyEmployees.Extensions
             var jwtConfiguration = new JwtConfiguration();
             configuration.Bind(jwtConfiguration.Section, jwtConfiguration);
 
-            var secretKey = "this is my custom Secret key for authentication";
+            var secretKey = Environment.GetEnvironmentVariable("SECRET");
 
             services.AddAuthentication(opt =>
             {

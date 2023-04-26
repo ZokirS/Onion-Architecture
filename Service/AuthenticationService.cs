@@ -24,7 +24,7 @@ namespace Service
         private readonly IOptions<JwtConfiguration> _configuration;
         private readonly JwtConfiguration _jwtConfiguration;
 
-        private string _key = "this is my custom Secret key for authentication";
+        private string _key = Environment.GetEnvironmentVariable("SECRET");
         private User? _user;
         public AuthenticationService(ILoggerManager logger, IMapper mapper,
             UserManager<User> userManager, IOptions<JwtConfiguration> configuration)
