@@ -20,10 +20,10 @@ namespace CompanyEmployees.Presentation.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Manager")]
-        public  IActionResult GetCompanies()
+        public  async Task<IActionResult> GetCompanies()
         {
-            var baseResult =  _serviceManager.CompanyService
-            .GetAllCompanies(false);
+            var baseResult = await  _serviceManager.CompanyService
+            .GetAllCompaniesAsync(false);
 
             var companies = baseResult.GetResult<IEnumerable<CompanyDto>>().Select(x=>$"{x.Name}");
 

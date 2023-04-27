@@ -1,8 +1,13 @@
-﻿using CompanyEmployees.Presentation.ActionFilters;
+﻿using Application.Commands;
+using Application.Handlers;
+using Application.Notifications;
+using Application.Queries;
+using CompanyEmployees.Presentation.ActionFilters;
 using CompanyEmployees.Presentation.Extensions;
 using CompanyEmployees.Presentation.ModelBinders;
 using Entities.Responses;
 using Marvin.Cache.Headers;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
@@ -17,11 +22,15 @@ namespace CompanyEmployees.Presentation.Controllers
     //[ResponseCache(CacheProfileName = "120SecondsDuration")]
     public class CompaniesController : ApiControllerBase
     {
+        private readonly ISender _sender;
         private readonly IServiceManager _service;
+        private readonly IPublisher _publisher;
 
-        public CompaniesController(IServiceManager service)
+        public CompaniesController(ISender sender, IServiceManager serviceManager, IPublisher publisher)
         {
-            _service = service;
+            _sender = sender;
+            _service = serviceManager;
+            _publisher = publisher;
         }
 
         /// <summary>
@@ -31,33 +40,37 @@ namespace CompanyEmployees.Presentation.Controllers
 
         [HttpGet(Name = "GetCompanies")]
         [Authorize(Roles = "Manager")]
-        public  IActionResult GetCompanies()
+        public async  Task<IActionResult> GetCompanies()
         {
-            var baseResult = _service.CompanyService.GetAllCompanies(trackChanges: false);
-            var companies = baseResult.GetResult<IEnumerable<CompanyDto>>();
+            var companies = await _sender.Send(new GetCompaniesQuery(trackChanges: false));
             return Ok(companies);
         }
 
         [HttpGet("{id:guid}", Name = "CompanyById")]
         [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
         [HttpCacheValidation(MustRevalidate =false)]
-        public  IActionResult GetCompany(Guid id)
+        public  async Task<IActionResult> GetCompany(Guid id)
         {
-            var baseResult =  _service.CompanyService.GetCompany(id, false);
+          /*  var baseResult = await _service.CompanyService.GetCompanyAsync(id, false);
             if(!baseResult.Success)
                 return ProccessError(baseResult);
 
-            var company = baseResult.GetResult<CompanyDto>();
+            var company = baseResult.GetResult<CompanyDto>();*/
+
+            var company = await _sender.Send(new GetCompanyQuery(id, trackChanges: false));
             return Ok(company);
         }
 
         [HttpPost(Name = "CreateCompany")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
-        public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
+        public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto companyForCreationDto)
         {
-            var createdCompany = await _service.CompanyService.CreateCompanyAsync(company);
+            if (companyForCreationDto is null)
+                return BadRequest("CompanyForCreationDto object is null");
 
-            return CreatedAtRoute("CompanyById", new { id = createdCompany.Id }, createdCompany);
+            var company = await _sender.Send(new CreateCompanyCommand(companyForCreationDto));
+
+            return CreatedAtRoute("CompanyById", new { id = company.Id }, company);
         }
 
         [HttpGet("collection/({ids})", Name = "CompanyCollection")]
@@ -79,17 +92,28 @@ namespace CompanyEmployees.Presentation.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteCompany(Guid id)
         {
-            await _service.CompanyService.DeleteCompanyAsync(id, trackChanges: false);
+            await _publisher.Publish(new CompanyDeletedNotification(id, TrackChanges: false));
 
             return NoContent();
         }
 
-        [HttpPut("{id:guid}")]
+        /*[HttpPut("{id:guid}")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> UpdateForCompany(Guid id,[FromBody] CompanyForUpdateDto company)
         {
              await _service.CompanyService.UpdateCompanyAsync(id, company, trackChanges: true);
              return NoContent();
+        }*/
+
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> UpdateCompany(Guid id, CompanyForUpdateDto companyForUpdateDto)
+        {
+            if (companyForUpdateDto is null)
+                return BadRequest("CompanyForUpdateDto object is null");
+
+            await _sender.Send(new UpdateCompanyCommand(id, companyForUpdateDto, TrackChanges: true));
+
+            return NoContent();
         }
 
         [HttpOptions]

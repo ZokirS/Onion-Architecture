@@ -22,16 +22,16 @@ namespace Service
             _mapper= mapper;
         }
 
-        public  ApiBaseResponse GetAllCompanies(bool trackChanges)
+        public async  Task<ApiBaseResponse> GetAllCompaniesAsync(bool trackChanges)
         {
-                var companies = _repository.Company.GetAllCompanies(trackChanges);
+                var companies = await _repository.Company.GetAllCompaniesAsync(trackChanges);
                 var companiesDto = _mapper.Map<IEnumerable<CompanyDto>>(companies);
                 return new ApiOkResponse<IEnumerable<CompanyDto>>(companiesDto);
         }
 
-        public ApiBaseResponse GetCompany(Guid id, bool trackChanges)
+        public async Task<ApiBaseResponse> GetCompanyAsync(Guid id, bool trackChanges)
         {
-            var company =  _repository.Company.GetCompany(id, trackChanges);
+            var company = await  _repository.Company.GetCompanyAsync(id, trackChanges);
 
             if (company is null)
                 return new CompanyNotFoundResponse(id);
@@ -100,7 +100,7 @@ namespace Service
 
         private async Task<Company> GetCompanyAndCheckIfItExists(Guid id, bool trackChanges)
         {
-            var company = _repository.Company.GetCompany(id, trackChanges);
+            var company = await _repository.Company.GetCompanyAsync(id, trackChanges);
             if (company is null)
                 throw new CompanyNotFoundException(id);
 

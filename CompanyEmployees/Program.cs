@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using NLog;
 using Service.DataShaping;
 using Shared.DataTransferObjects;
+using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +54,8 @@ builder.Services.AddControllers(config =>
 }).AddXmlDataContractSerializerFormatters()
   .AddCustomCsvFotmatter()
   .AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
+builder.Services.AddMediatR(typeof(Application.AssemblyRefence).Assembly);
+builder.Services.AddAutoMapper(typeof(Program));
 #endregion
 
 

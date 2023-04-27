@@ -103,7 +103,7 @@ namespace Service
 
         private async Task CheckCompanyIsExcist(Guid companyId, bool trackChanges)
         {
-            var company =  _repository.Company.GetCompany(companyId, trackChanges);
+            var company = await  _repository.Company.GetCompanyAsync(companyId, trackChanges);
             if (company is null)
                 throw new CompanyNotFoundException(companyId);
         }
