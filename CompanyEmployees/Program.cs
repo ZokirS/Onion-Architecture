@@ -11,6 +11,8 @@ using NLog;
 using Service.DataShaping;
 using Shared.DataTransferObjects;
 using MediatR;
+using FluentValidation;
+using Application.Behaviors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +58,9 @@ builder.Services.AddControllers(config =>
   .AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
 builder.Services.AddMediatR(typeof(Application.AssemblyRefence).Assembly);
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>),
+    typeof(ValidationBehavior<,>));
+builder.Services.AddValidatorsFromAssembly(typeof(Application.AssemblyRefence).Assembly);
 #endregion
 
 
