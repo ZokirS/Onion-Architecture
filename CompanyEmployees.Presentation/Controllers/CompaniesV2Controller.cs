@@ -8,7 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace CompanyEmployees.Presentation.Controllers
 {
-    [Route("api/companies")]
+    [Route("api/[controller]")]
     [ApiVersion("2.0")]
     [ApiExplorerSettings(GroupName = "v2")]
     [ApiController]
