@@ -20,7 +20,7 @@ namespace CompanyEmployees.Presentation.Controllers
     [ApiExplorerSettings(GroupName = "v1")]
     [ApiController]
     //[ResponseCache(CacheProfileName = "120SecondsDuration")]
-    public class CompaniesController : ApiControllerBase
+    public class CompaniesController : ControllerBase
     {
         private readonly ISender _sender;
         private readonly IServiceManager _service;
@@ -51,12 +51,6 @@ namespace CompanyEmployees.Presentation.Controllers
         [HttpCacheValidation(MustRevalidate =false)]
         public  async Task<IActionResult> GetCompany(Guid id)
         {
-          /*  var baseResult = await _service.CompanyService.GetCompanyAsync(id, false);
-            if(!baseResult.Success)
-                return ProccessError(baseResult);
-
-            var company = baseResult.GetResult<CompanyDto>();*/
-
             var company = await _sender.Send(new GetCompanyQuery(id, trackChanges: false));
             return Ok(company);
         }
