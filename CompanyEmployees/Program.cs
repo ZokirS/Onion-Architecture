@@ -13,6 +13,7 @@ using Shared.DataTransferObjects;
 using MediatR;
 using FluentValidation;
 using Application.Behaviors;
+using Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,6 +91,7 @@ app.UseHttpCacheHeaders();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MigrateDatabase().Run();
 app.Run();
 
 static NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter() =>
