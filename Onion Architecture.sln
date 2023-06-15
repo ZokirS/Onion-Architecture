@@ -21,9 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompanyEmployees.Presentati
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{0D81BDB5-7491-4C59-9C6E-1FD5EAF42164}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{C468D8BF-1D67-4325-8FF3-22162DF025A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{C468D8BF-1D67-4325-8FF3-22162DF025A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{61386B7B-F654-4C12-9914-65B0FD39B640}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{61386B7B-F654-4C12-9914-65B0FD39B640}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompanyEmployees.IDP", "CompanyEmployees.IDP\CompanyEmployees.IDP.csproj", "{BF718428-2644-400E-BA6F-36CD246CB613}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{61386B7B-F654-4C12-9914-65B0FD39B640}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61386B7B-F654-4C12-9914-65B0FD39B640}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61386B7B-F654-4C12-9914-65B0FD39B640}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF718428-2644-400E-BA6F-36CD246CB613}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF718428-2644-400E-BA6F-36CD246CB613}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF718428-2644-400E-BA6F-36CD246CB613}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF718428-2644-400E-BA6F-36CD246CB613}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
