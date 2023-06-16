@@ -27,7 +27,7 @@ builder.Services.AddAuthentication(options =>
     opt.ResponseType = OpenIdConnectResponseType.Code;
     opt.SaveTokens = true;
     opt.ClientSecret = "CompanyEmployeeClientSecret";
-    opt.UsePkce = false;
+    opt.GetClaimsFromUserInfoEndpoint = true;
 });
 var app = builder.Build();
 
