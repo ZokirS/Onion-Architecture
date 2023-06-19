@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Text.Json;
+using IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System.Security.Claims;
 
 namespace CompanyEmployees.Client.Controllers
 {
@@ -33,9 +37,28 @@ namespace CompanyEmployees.Client.Controllers
         {
             return View();
         }
-
-        public IActionResult Privacy()
+        [Authorize(Roles ="Administrator")]
+        public async Task<IActionResult> Privacy()
         {
+            var idClient = _httpClientFactory.CreateClient("IDPClient");
+            var metaDataResponse = await idClient.GetDiscoveryDocumentAsync();
+
+            var accessToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
+
+            var response = await idClient.GetUserInfoAsync(new UserInfoRequest
+            {
+                Address = metaDataResponse.UserInfoEndpoint,
+                Token = accessToken
+            });
+            if (response.IsError)
+            {
+                throw new Exception("Problem while fetching data UserInfo endpoint", response.Exception);
+            }
+            var addressClaim = response.Claims.FirstOrDefault(x=>x.Type.Equals("address"));
+            User.AddIdentity(new ClaimsIdentity(new List<Claim>
+            {
+                new Claim(addressClaim.Type.ToString(), addressClaim.Value.ToString())
+            }));
             return View();
         }
 

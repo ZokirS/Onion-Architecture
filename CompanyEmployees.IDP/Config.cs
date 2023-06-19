@@ -12,9 +12,11 @@ namespace CompanyEmployees.IDP
     {
         public static IEnumerable<IdentityResource> Ids =>
             new IdentityResource[]
-            { 
+            {
                 new IdentityResources.OpenId(),
-                new IdentityResources.Profile()
+                new IdentityResources.Profile(),
+                new IdentityResources.Address(),
+                new IdentityResource("roles", "User role(s)", new List<string>{"role"}),
             };
 
         public static IEnumerable<ApiScope> ApiScopes =>
@@ -40,7 +42,10 @@ namespace CompanyEmployees.IDP
                     AllowedScopes =
                     {
                         IdentityServerConstants.StandardScopes.OpenId,
-                        IdentityServerConstants.StandardScopes.Profile
+                        IdentityServerConstants.StandardScopes.Profile,
+                        IdentityServerConstants.StandardScopes.Address,
+                        "roles"
+                       
                     },
                     ClientSecrets =
                     {
