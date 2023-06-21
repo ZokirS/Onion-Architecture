@@ -7,6 +7,7 @@ using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Security.Claims;
+using System.Net;
 
 namespace CompanyEmployees.Client.Controllers
 {
@@ -25,19 +26,24 @@ namespace CompanyEmployees.Client.Controllers
 
             var response = await httpClient.GetAsync("api/companies").ConfigureAwait(false);
 
-            response.EnsureSuccessStatusCode();
-
-            var companiesString = await response.Content.ReadAsStringAsync();
-            var companies = JsonSerializer.Deserialize<List<CompanyViewModel>>(companiesString,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-            return View(companies);
+            if (response.IsSuccessStatusCode)
+            {
+                var companiesString = await response.Content.ReadAsStringAsync();
+                var companies = JsonSerializer.Deserialize<List<CompanyViewModel>>(companiesString,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                return View(companies);
+            }
+            else if(response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
+            {
+                return RedirectToAction("AccessDenied", "Auth");
+            }
+            throw new Exception("There is problem accessing the API.");
         }
         public IActionResult Index()
         {
             return View();
         }
-        [Authorize(Roles ="Administrator")]
+        [Authorize(Policy = "CanCreateAndModifyData")]
         public async Task<IActionResult> Privacy()
         {
             var idClient = _httpClientFactory.CreateClient("IDPClient");

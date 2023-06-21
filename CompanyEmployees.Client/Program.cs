@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
+using CompanyEmployees.Client.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,7 @@ builder.Services.AddHttpClient("APIClient", client =>
     client.BaseAddress = new Uri("https://localhost:5001/");
     client.DefaultRequestHeaders.Clear();
     client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
-});
+}).AddHttpMessageHandler<BearerTokenHandler>();
 
 builder.Services.AddHttpClient("IDPClient", client =>
 {
@@ -25,8 +26,18 @@ builder.Services.AddHttpClient("IDPClient", client =>
     client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
 });
 // Add services to the container.
+builder.Services.AddAuthorization(authOpt =>
+{
+    authOpt.AddPolicy("CanCreateAndModifyData", policyBuilder =>
+    {
+        policyBuilder.RequireAuthenticatedUser();
+        policyBuilder.RequireRole("role", "Administrator");
+        policyBuilder.RequireClaim("country", "USA");
+    });
+});
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<BearerTokenHandler>();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -48,6 +59,9 @@ builder.Services.AddAuthentication(options =>
     opt.Scope.Add("address");
     opt.Scope.Add("roles");
     opt.ClaimActions.MapUniqueJsonKey("role", "role");
+    opt.Scope.Add("companyemployeeapi.scope");
+    opt.Scope.Add("country");
+    opt.ClaimActions.MapUniqueJsonKey("country", "country");
 
     opt.TokenValidationParameters = new TokenValidationParameters
     {

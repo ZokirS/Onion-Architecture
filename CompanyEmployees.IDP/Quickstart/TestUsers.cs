@@ -23,7 +23,8 @@ namespace IdentityServerHost.Quickstart.UI
                         new Claim("given_name", "John"),
                         new Claim("family_name", "Doe"),
                         new Claim("address", "John Doe Boulevard 323"),
-                        new Claim("role", "Administrator")
+                        new Claim("role", "Administrator"),
+                        new Claim("country", "USA")
                     }
                 },
                 new TestUser
@@ -36,7 +37,8 @@ namespace IdentityServerHost.Quickstart.UI
                         new Claim("given_name", "Jane"),
                         new Claim("family_name", "Doe"),
                         new Claim("address", "Jane Doe Street 123"),
-                        new Claim("role", "Visitor")
+                        new Claim("role", "Visitor"),
+                        new Claim("country", "USA")
                     }
                 }
             };

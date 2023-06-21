@@ -17,15 +17,24 @@ namespace CompanyEmployees.IDP
                 new IdentityResources.Profile(),
                 new IdentityResources.Address(),
                 new IdentityResource("roles", "User role(s)", new List<string>{"role"}),
+                new IdentityResource("country", "Your country", new List<string>{"country"})
             };
 
         public static IEnumerable<ApiScope> ApiScopes =>
             new ApiScope[]
-            { };
+            {
+                new ApiScope("companyemployeeapi.scope", "CompanyEmployee Api Scope")
+            };
 
         public static IEnumerable<ApiResource> Apis =>
             new ApiResource[]
-            { };
+            {
+            new ApiResource("companyemployeeapi","CompanyEmployee Api")
+            {
+                Scopes = { "companyemployeeapi.scope" },
+                UserClaims = new List<string>{"role"}
+            }
+            };
 
         public static IEnumerable<Client> Clients =>
             new Client[]
@@ -44,15 +53,15 @@ namespace CompanyEmployees.IDP
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.Address,
-                        "roles"
-                       
+                        "roles",
+                        "companyemployeeapi.scope",
+                        "country"
                     },
                     ClientSecrets =
                     {
                         new Secret("CompanyEmployeeClientSecret".Sha512())
                     },
                     RequirePkce = true,
-                    RequireConsent = false,
                     PostLogoutRedirectUris = new List<string> {"http://localhost:5010/signout-callback-oidc"},
                     ClientUri = "https://localhost:5010"
                 }
