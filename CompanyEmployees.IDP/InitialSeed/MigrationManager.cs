@@ -1,0 +1,73 @@
+﻿using IdentityServer4.EntityFramework.DbContexts;
+using IdentityServer4.EntityFramework.Mappers;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System.Linq;
+using System;
+
+namespace CompanyEmployees.IDP.InitialSeed
+{
+    public static class MigrationManager
+    {
+        public static IHost MigrateDatabase(this IHost host)
+        {
+            using(var scope = host.Services.CreateScope())
+            {
+                scope.ServiceProvider
+                    .GetRequiredService<PersistedGrantDbContext>()
+                    .Database
+                    .Migrate();
+
+                using(var context = scope.ServiceProvider
+                    .GetRequiredService<ConfigurationDbContext>())
+                {
+                    try
+                    {
+                    context.Database.Migrate();
+
+                        if (!context.Clients.Any())
+                        {
+                            foreach (var client in context.Clients)
+                            {
+                                context.Clients.Add(client);
+                            }
+                            context.SaveChanges();
+                        }
+                        if (!context.IdentityResources.Any())
+                        {
+                            foreach(var resource in context.IdentityResources)
+                            {
+                                context.IdentityResources.Add(resource);
+                            }
+                            context.SaveChanges();
+                        }
+                        if (!context.ApiScopes.Any()) 
+                        {
+                            foreach (var apiScope in Config.ApiScopes)
+                            { 
+                                context.ApiScopes.Add(apiScope.ToEntity());
+                            }
+                            context.SaveChanges(); 
+                        }
+                        if (!context.ApiResources.Any()) 
+                        { 
+                            foreach (var resource in Config.Apis) 
+                            { 
+                                context.ApiResources.Add(resource.ToEntity());
+                            } 
+                            context.SaveChanges();
+                        }
+                    }
+                    catch (Exception)
+                    {
+
+                        throw;
+                    }
+
+                }
+            }
+                    return host;
+        }
+    }
+}

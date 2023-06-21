@@ -8,6 +8,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using System;
+using CompanyEmployees.IDP.InitialSeed;
 
 namespace CompanyEmployees.IDP
 {
@@ -35,7 +36,7 @@ namespace CompanyEmployees.IDP
             try
             {
                 Log.Information("Starting host...");
-                CreateHostBuilder(args).Build().Run();
+                CreateHostBuilder(args).Build().MigrateDatabase().Run();
                 return 0;
             }
             catch (Exception ex)
