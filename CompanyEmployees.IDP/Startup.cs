@@ -5,32 +5,25 @@
 using IdentityServerHost.Quickstart.UI;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using IdentityServer4.EntityFramework;
-using System.Reflection;
-using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace CompanyEmployees.IDP
 {
     public class Startup
     {
         public IWebHostEnvironment Environment { get; }
-        public IConfiguration Configuration { get; set; }
 
-        public Startup(IWebHostEnvironment environment, IConfiguration configuration)
+        public Startup(IWebHostEnvironment environment)
         {
             Environment = environment;
-            Configuration = configuration;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
             // uncomment, if you want to add an MVC-based UI
             services.AddControllersWithViews();
-
-            var migrationAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
             var builder = services.AddIdentityServer(options =>
             {
@@ -41,19 +34,7 @@ namespace CompanyEmployees.IDP
                 .AddInMemoryApiScopes(Config.ApiScopes)
                 .AddInMemoryApiResources(Config.Apis)
                 .AddInMemoryClients(Config.Clients)
-                .AddTestUsers(TestUsers.Users)
-                .AddConfigurationStore(opt =>
-                {
-                    opt.ConfigureDbContext = c =>
-                    c.UseSqlServer(Configuration.GetConnectionString("sqlConnection"),
-                    sql => sql.MigrationsAssembly(migrationAssembly));
-                })
-                .AddOperationalStore(opt =>
-                {
-                    opt.ConfigureDbContext = o =>
-                    o.UseSqlServer(Configuration.GetConnectionString("sqlConnection"),
-                    sql => sql.MigrationsAssembly(migrationAssembly));
-                });
+                .AddTestUsers(TestUsers.Users);
 
             // not recommended for production - you need to store your key material somewhere secure
             builder.AddDeveloperSigningCredential();
