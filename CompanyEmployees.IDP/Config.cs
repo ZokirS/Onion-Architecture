@@ -63,7 +63,10 @@ namespace CompanyEmployees.IDP
                     },
                     RequirePkce = true,
                     PostLogoutRedirectUris = new List<string> {"http://localhost:5010/signout-callback-oidc"},
-                    ClientUri = "https://localhost:5010"
+                    ClientUri = "https://localhost:5010",
+                    AccessTokenLifetime = 120,
+                    AllowOfflineAccess = true,
+                    UpdateAccessTokenClaimsOnRefresh = true
                 }
             };
     }

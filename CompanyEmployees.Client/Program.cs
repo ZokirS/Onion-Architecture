@@ -62,6 +62,7 @@ builder.Services.AddAuthentication(options =>
     opt.Scope.Add("companyemployeeapi.scope");
     opt.Scope.Add("country");
     opt.ClaimActions.MapUniqueJsonKey("country", "country");
+    opt.Scope.Add("offline_access");
 
     opt.TokenValidationParameters = new TokenValidationParameters
     {
