@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using CompanyEmployees.IDP.InitialSeed;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -35,7 +36,7 @@ namespace CompanyEmployees.IDP
             try
             {
                 Log.Information("Starting host...");
-                CreateHostBuilder(args).Build().Run();
+                CreateHostBuilder(args).Build().MigrateDatabase().Run();
                 return 0;
             }
             catch (Exception ex)
