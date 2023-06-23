@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace CompanyEmployees.IDP.Migrations
 {
-    public partial class CreateIdentityTables : Migration
+    public partial class AddRolesToDb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -157,6 +157,16 @@ namespace CompanyEmployees.IDP.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[] { "6d506b42-9fa0-4ef7-a92a-0b5b0a123665", "fad860ee-17be-4374-8c49-6f47315a41df", "Visitor", "VISITOR" });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[] { "c3a0cb55-ddaf-4f2f-8419-f3f937698aa1", "e069030d-9014-47c1-8dca-c5ed2a3b301f", "Administrator", "ADMINISTRATOR" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

@@ -38,6 +38,7 @@ namespace CompanyEmployees.IDP
             try
             {
                 Log.Information("Starting host...");
+
                 var builder = CreateHostBuilder(args).Build();
 
                 var config = builder.Services.GetRequiredService<IConfiguration>();

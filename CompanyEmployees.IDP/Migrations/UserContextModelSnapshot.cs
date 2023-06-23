@@ -129,14 +129,14 @@ namespace CompanyEmployees.IDP.Migrations
                         new
                         {
                             Id = "c3a0cb55-ddaf-4f2f-8419-f3f937698aa1",
-                            ConcurrencyStamp = "592af8f1-a06e-4f7e-a1c1-132337c2df3c",
+                            ConcurrencyStamp = "e069030d-9014-47c1-8dca-c5ed2a3b301f",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "6d506b42-9fa0-4ef7-a92a-0b5b0a123665",
-                            ConcurrencyStamp = "c9cc99a7-23b3-4a97-9250-f7162bc303df",
+                            ConcurrencyStamp = "fad860ee-17be-4374-8c49-6f47315a41df",
                             Name = "Visitor",
                             NormalizedName = "VISITOR"
                         });
