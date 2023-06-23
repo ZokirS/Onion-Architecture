@@ -4,6 +4,8 @@
 
 using CompanyEmployees.IDP.InitialSeed;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
@@ -36,7 +38,14 @@ namespace CompanyEmployees.IDP
             try
             {
                 Log.Information("Starting host...");
-                CreateHostBuilder(args).Build().MigrateDatabase().Run();
+                var builder = CreateHostBuilder(args).Build();
+
+                var config = builder.Services.GetRequiredService<IConfiguration>();
+                var connectionString = config.GetConnectionString("identitySqlConnection");
+
+                SeedUserData.EnsureSeedData(connectionString);
+
+                builder.MigrateDatabase().Run();
                 return 0;
             }
             catch (Exception ex)

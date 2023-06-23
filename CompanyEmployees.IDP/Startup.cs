@@ -2,14 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using IdentityServerHost.Quickstart.UI;
+using CompanyEmployees.IDP.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 using System.Reflection;
 
 namespace CompanyEmployees.IDP
@@ -32,12 +32,18 @@ namespace CompanyEmployees.IDP
 
             var migrationAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
+            services.AddDbContext<UserContext>(options =>
+            options.UseSqlServer(Configuration.GetConnectionString("identitySqlConnection")));
+
+            services.AddIdentity<User, IdentityRole>()
+                .AddEntityFrameworkStores<UserContext>()
+                .AddDefaultTokenProviders();
+
             var builder = services.AddIdentityServer(options =>
             {
                 // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
                 options.EmitStaticAudienceClaim = true;
             })
-                .AddTestUsers(TestUsers.Users)
                 .AddConfigurationStore(opt =>
                 {
                     opt.ConfigureDbContext = c =>
@@ -49,7 +55,8 @@ namespace CompanyEmployees.IDP
                     opt.ConfigureDbContext = c =>
                     c.UseSqlServer(Configuration.GetConnectionString("sqlConnection"),
                     sql => sql.MigrationsAssembly(migrationAssembly));
-                });
+                })
+                .AddAspNetIdentity<User>();
 
             // not recommended for production - you need to store your key material somewhere secure
             builder.AddDeveloperSigningCredential();

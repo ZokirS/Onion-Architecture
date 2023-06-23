@@ -1,28 +1,22 @@
-﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
-
-using System;
-using System.Linq;
-using System.Security.Claims;
-using CompanyEmployees.IDP.Entities;
-using IdentityModel;
-using IdentityServerAspNetIdentity.Data;
-using IdentityServerAspNetIdentity.Models;
+﻿using CompanyEmployees.IDP.Entities;
+using IdentityServer4.ResponseHandling;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
+using System.Linq;
+using System;
+using System.Security.Claims;
+using IdentityModel;
 
-namespace IdentityServerAspNetIdentity
+namespace CompanyEmployees.IDP
 {
-    public class SeedData
+    public class SeedUserData
     {
         public static void EnsureSeedData(string connectionString)
         {
             var service = new ServiceCollection();
             service.AddLogging();
-            service.AddDbContext<UserContext>(opt =>
+            service.AddDbContext<UserContext>(opt=>
             opt.UseSqlServer(connectionString));
 
             service.AddIdentity<User, IdentityRole>(o =>
@@ -32,19 +26,19 @@ namespace IdentityServerAspNetIdentity
             }).AddEntityFrameworkStores<UserContext>()
             .AddDefaultTokenProviders();
 
-            using (var serviceProvider = service.BuildServiceProvider())
+            using(var serviceProvider = service.BuildServiceProvider())
             {
-                using (var scope = serviceProvider
+                using(var scope = serviceProvider
                     .GetRequiredService<IServiceScopeFactory>().CreateScope())
                 {
-                    CreateUser(scope, "John", "Doe",
+                    CreateUser(scope, "John", "Doe", 
                         "John Doe's Boulevard 323", "USA",
                         "97a3aa4a-7a89-47f3-9814-74497fb92ccb", "JohnPassword",
                         "Administrator", "john@mail.com");
 
-                    CreateUser(scope, "Jane", "Doe",
-                        "Jane Doe's Avenue 214", "USA",
-                        "64aca900-7bc7-4645-b291-38f1b7b5963c", "JanePassword",
+                    CreateUser(scope, "Jane", "Doe", 
+                        "Jane Doe's Avenue 214", "USA", 
+                        "64aca900-7bc7-4645-b291-38f1b7b5963c", "JanePassword", 
                         "Visitor", "jane@mail.com");
                 }
             }
@@ -56,7 +50,7 @@ namespace IdentityServerAspNetIdentity
             var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
             var user = userMgr.FindByNameAsync(name).Result;
 
-            if (user is null)
+            if(user is null)
             {
                 user = new User
                 {
@@ -87,10 +81,10 @@ namespace IdentityServerAspNetIdentity
             CheckResult(result);
         }
 
-        private static void CheckResult(IdentityResult result)
+        private static void CheckResult(IdentityResult result) 
         {
-            if (!result.Succeeded)
-            {
+            if (!result.Succeeded) 
+            { 
                 throw new Exception(result.Errors.First().Description);
             }
         }
