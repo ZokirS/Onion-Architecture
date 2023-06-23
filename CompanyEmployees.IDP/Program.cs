@@ -44,7 +44,7 @@ namespace CompanyEmployees.IDP
                 var config = builder.Services.GetRequiredService<IConfiguration>();
                 var connectionString = config.GetConnectionString("identitySqlConnection");
 
-                SeedUserData.EnsureSeedData(connectionString);
+               // SeedUserData.EnsureSeedData(connectionString);
 
                 builder.MigrateDatabase().Run();
                 return 0;

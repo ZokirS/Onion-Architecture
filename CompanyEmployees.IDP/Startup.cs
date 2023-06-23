@@ -27,6 +27,7 @@ namespace CompanyEmployees.IDP
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper(typeof(Startup));
             // uncomment, if you want to add an MVC-based UI
             services.AddControllersWithViews();
 
@@ -35,7 +36,13 @@ namespace CompanyEmployees.IDP
             services.AddDbContext<UserContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("identitySqlConnection")));
 
-            services.AddIdentity<User, IdentityRole>()
+            services.AddIdentity<User, IdentityRole>(o =>
+            {
+                o.Password.RequireDigit = false;
+                o.Password.RequireLowercase = false;
+                o.Password.RequiredLength = 7;
+
+            })
                 .AddEntityFrameworkStores<UserContext>()
                 .AddDefaultTokenProviders();
 

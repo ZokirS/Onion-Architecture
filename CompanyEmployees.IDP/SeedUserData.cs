@@ -48,13 +48,13 @@ namespace CompanyEmployees.IDP
             string address, string country, string id, string password, string role, string email)
         {
             var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-            var user = userMgr.FindByNameAsync(name).Result;
+            var user = userMgr.FindByNameAsync(email).Result;
 
             if(user is null)
             {
                 user = new User
                 {
-                    UserName = name,
+                    UserName = email,
                     Email = email,
                     FirstName = name,
                     LastName = lastName,
