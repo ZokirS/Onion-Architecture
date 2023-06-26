@@ -90,7 +90,6 @@ namespace EmailService
             {
                 try
                 {
-                    client.CheckCertificateRevocation = false;
                     await client.ConnectAsync(_emailConfig.SmtpServer, _emailConfig.Port, MailKit.Security.SecureSocketOptions.None);
                     client.AuthenticationMechanisms.Remove("XOAUTH2");
                     await client.AuthenticateAsync(_emailConfig.UserName, _emailConfig.Password);
