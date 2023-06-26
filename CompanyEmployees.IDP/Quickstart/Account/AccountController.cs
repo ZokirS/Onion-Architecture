@@ -5,6 +5,7 @@
 using AutoMapper;
 using CompanyEmployees.IDP.Entities;
 using CompanyEmployees.IDP.Entities.ViewModels;
+using EmailService;
 using IdentityModel;
 using IdentityServer4;
 using IdentityServer4.Events;
@@ -43,6 +44,7 @@ namespace IdentityServerHost.Quickstart.UI
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IMapper _mapper;
+        private readonly IEmailSender _emailSender;
 
         public AccountController(
             IIdentityServerInteractionService interaction,
@@ -51,7 +53,8 @@ namespace IdentityServerHost.Quickstart.UI
             IEventService events,
             UserManager<User> userManager,
             SignInManager<User> signInManager,
-            IMapper mapper)
+            IMapper mapper,
+            IEmailSender emailSender)
         {
             // if the TestUserStore is not in DI, then we'll just use the global users collection
             // this is where you would plug in your own custom identity management library (e.g. ASP.NET Identity)
@@ -63,6 +66,7 @@ namespace IdentityServerHost.Quickstart.UI
             _userManager = userManager;
             _signInManager = signInManager;
             _mapper = mapper;
+            _emailSender = emailSender;
         }
 
         /// <summary>
@@ -256,6 +260,74 @@ namespace IdentityServerHost.Quickstart.UI
             return Redirect(returnUrl);
         }
 
+        [HttpGet]
+        public IActionResult ForgotPassword(string returnUrl)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public  async Task<IActionResult> ForgotPassword(ForgotPasswordModel forgotPasswordModel,
+            string returnUrl)
+        {
+            if (!ModelState.IsValid) 
+                return View(forgotPasswordModel);
+            
+            var user = await _userManager.FindByEmailAsync(forgotPasswordModel.Email);
+            if (user == null) 
+                return RedirectToAction(nameof(ForgotPasswordConfirmation));
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user); 
+            var callback = Url.Action(nameof(ResetPassword), "Account", new { token, email = user.Email, returnUrl }, Request.Scheme);
+            var message = new Message(new string[] { user.Email }, "Reset password token", callback, null); 
+            await _emailSender.SendEmailAsync(message);
+            return RedirectToAction(nameof(ForgotPasswordConfirmation));
+        }
+
+        [HttpGet]
+        public IActionResult ForgotPasswordConfirmation()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string token, string email, string returnUrl)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            var model = new ResetPasswordModel { Token = token, Email = email };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordModel model, string returnUrl)
+        {
+            if(!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+                RedirectToAction(nameof(ResetPassword), new { returnUrl });
+
+            var resetResult = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
+            if (!resetResult.Succeeded)
+            {
+                foreach (var error in resetResult.Errors)
+                    ModelState.TryAddModelError(error.Code, error.Description);
+
+                return View();
+            }
+            return RedirectToAction(nameof(ResetPasswordConfirmation), new { returnUrl });
+        }
+
+        [HttpGet]
+        public IActionResult ResetPasswordConfirmation(string returnUrl)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
 
         /*****************************************/
         /* helper APIs for the AccountController */

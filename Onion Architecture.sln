@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompanyEmployees.IDP", "Com
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompanyEmployees.Client", "CompanyEmployees.Client\CompanyEmployees.Client.csproj", "{307E410B-6A12-4283-BD9F-73397C470905}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailService", "EmailService\EmailService.csproj", "{36E69954-31E6-4441-9A04-5E5BCF13B29A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{307E410B-6A12-4283-BD9F-73397C470905}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{307E410B-6A12-4283-BD9F-73397C470905}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{307E410B-6A12-4283-BD9F-73397C470905}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36E69954-31E6-4441-9A04-5E5BCF13B29A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36E69954-31E6-4441-9A04-5E5BCF13B29A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36E69954-31E6-4441-9A04-5E5BCF13B29A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36E69954-31E6-4441-9A04-5E5BCF13B29A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

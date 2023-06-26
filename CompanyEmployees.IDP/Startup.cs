@@ -3,6 +3,7 @@
 
 
 using CompanyEmployees.IDP.Entities;
+using EmailService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using System.Reflection;
 
 namespace CompanyEmployees.IDP
@@ -29,8 +31,15 @@ namespace CompanyEmployees.IDP
         {
             services.AddAutoMapper(typeof(Startup));
             // uncomment, if you want to add an MVC-based UI
-            services.AddControllersWithViews();
 
+            var emailConfig = Configuration
+                .GetSection("EmailConfiguration")
+                .Get<EmailConfiguration>();
+
+            services.AddSingleton(emailConfig);
+            services.AddSingleton<IEmailSender, EmailSender>();
+
+            services.AddControllersWithViews();
             var migrationAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
             services.AddDbContext<UserContext>(options =>
@@ -67,6 +76,9 @@ namespace CompanyEmployees.IDP
 
             // not recommended for production - you need to store your key material somewhere secure
             builder.AddDeveloperSigningCredential();
+
+            services.Configure<DataProtectionTokenProviderOptions>(opt=>
+            opt.TokenLifespan = TimeSpan.FromHours(2));
         }
 
         public void Configure(IApplicationBuilder app)
