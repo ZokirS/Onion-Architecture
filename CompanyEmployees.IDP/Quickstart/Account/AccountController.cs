@@ -152,7 +152,7 @@ namespace IdentityServerHost.Quickstart.UI
                     } 
                 }
                 await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId: context?.Client.ClientId)); 
-                ModelState.AddModelError(string.Empty, AccountOptions.InvalidCredentialsErrorMessage);
+                ModelState.AddModelError(string.Empty, AccountOptions.InvalidLoginAttempt);
             }
 
             // something went wrong, show form with error
@@ -257,7 +257,10 @@ namespace IdentityServerHost.Quickstart.UI
                 new Claim(JwtClaimTypes.Address, user.Address),
                 new Claim("country", user.Country)
             });
-            return Redirect(returnUrl);
+
+            await SendEmailConfirmationLink(user, returnUrl);
+
+            return Redirect(nameof(SuccessRegistration));
         }
 
         [HttpGet]
@@ -329,6 +332,33 @@ namespace IdentityServerHost.Quickstart.UI
             return View();
         }
 
+        [HttpGet] public async Task<IActionResult> ConfirmEmail(string token, string email, string returnUrl) 
+        { 
+            ViewData["ReturnUrl"] = returnUrl; 
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) 
+                return RedirectToAction(nameof(Error), new { returnUrl }); 
+            
+            var result = await _userManager.ConfirmEmailAsync(user, token); 
+
+            if (result.Succeeded) 
+                return View(nameof(ConfirmEmail));
+            else 
+                return RedirectToAction(nameof(Error), new { returnUrl }); 
+        }
+
+        [HttpGet]
+        public IActionResult SuccessRegistration()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Error(string returnUrl)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
         /*****************************************/
         /* helper APIs for the AccountController */
         /*****************************************/
@@ -390,6 +420,16 @@ namespace IdentityServerHost.Quickstart.UI
             };
         }
 
+        private async Task SendEmailConfirmationLink(User user, string returnUrl)
+        {
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            var confirmationLink = Url.Action(nameof(ConfirmEmail), "Account", new { token, email = user.Email, returnUrl }, Request.Scheme);
+            var message = new Message(new string[] { user.Email },
+                "Confirmation email Link", confirmationLink, null);
+
+            await _emailSender.SendEmailAsync(message);
+        }
         private async Task<LoginViewModel> BuildLoginViewModelAsync(LoginInputModel model)
         {
             var vm = await BuildLoginViewModelAsync(model.ReturnUrl);

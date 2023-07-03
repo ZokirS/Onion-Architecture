@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using CompanyEmployees.IDP.CustomTokenProviders;
 using CompanyEmployees.IDP.Entities;
 using EmailService;
 using Microsoft.AspNetCore.Builder;
@@ -50,10 +51,13 @@ namespace CompanyEmployees.IDP
                 o.Password.RequireDigit = false;
                 o.Password.RequireLowercase = false;
                 o.Password.RequiredLength = 7;
-
+                o.User.RequireUniqueEmail = true;
+                o.SignIn.RequireConfirmedEmail = true;
+                o.Tokens.EmailConfirmationTokenProvider = "emailconfirmation";
             })
                 .AddEntityFrameworkStores<UserContext>()
-                .AddDefaultTokenProviders();
+                .AddDefaultTokenProviders()
+                .AddTokenProvider<EmailConfirmationTokenProvider<User>>("emailconfirmation");
 
             var builder = services.AddIdentityServer(options =>
             {
@@ -79,6 +83,9 @@ namespace CompanyEmployees.IDP
 
             services.Configure<DataProtectionTokenProviderOptions>(opt=>
             opt.TokenLifespan = TimeSpan.FromHours(2));
+
+            services.Configure<EmailConfirmationTokenProviderOptions>(opt=>
+            opt.TokenLifespan = TimeSpan.FromDays(3));
         }
 
         public void Configure(IApplicationBuilder app)
