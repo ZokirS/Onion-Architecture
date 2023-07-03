@@ -54,6 +54,9 @@ namespace CompanyEmployees.IDP
                 o.User.RequireUniqueEmail = true;
                 o.SignIn.RequireConfirmedEmail = true;
                 o.Tokens.EmailConfirmationTokenProvider = "emailconfirmation";
+                o.Lockout.AllowedForNewUsers = true;
+                o.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
+                o.Lockout.MaxFailedAccessAttempts = 3;
             })
                 .AddEntityFrameworkStores<UserContext>()
                 .AddDefaultTokenProviders()

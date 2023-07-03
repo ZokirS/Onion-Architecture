@@ -151,8 +151,15 @@ namespace IdentityServerHost.Quickstart.UI
                         throw new Exception("invalid return URL");
                     } 
                 }
-                await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId: context?.Client.ClientId)); 
-                ModelState.AddModelError(string.Empty, AccountOptions.InvalidLoginAttempt);
+                if (result.IsLockedOut)
+                {
+                    await HandleLockOut(model.Username, model.ReturnUrl);
+                }
+                else
+                {
+                    await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId: context?.Client.ClientId));
+                    ModelState.AddModelError(string.Empty, AccountOptions.InvalidLoginAttempt);
+                }
             }
 
             // something went wrong, show form with error
@@ -322,6 +329,11 @@ namespace IdentityServerHost.Quickstart.UI
 
                 return View();
             }
+            if(await _userManager.IsLockedOutAsync(user))
+            {
+                await _userManager.SetLockoutEndDateAsync(user, new DateTimeOffset(new
+                    DateTime(1000, 1, 1, 1, 1, 1)));
+            }
             return RedirectToAction(nameof(ResetPasswordConfirmation), new { returnUrl });
         }
 
@@ -418,6 +430,21 @@ namespace IdentityServerHost.Quickstart.UI
                 Username = context?.LoginHint,
                 ExternalProviders = providers.ToArray()
             };
+        }
+
+        private async Task HandleLockOut(string email, string returnUrl)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            var forgotPassLink = Url.Action(nameof(ForgotPassword), "Account",
+                new { returnUrl }, Request.Scheme);
+
+            var content = string.Format(@"Your account is locked out, to reset password, please click this link: {0}", forgotPassLink);
+            var message = new Message(new string[] { user.Email },
+                "Locked out email confirmation.", content, null);
+
+            await _emailSender.SendEmailAsync(message);
+
+            ModelState.TryAddModelError("", "The account is locked out.");
         }
 
         private async Task SendEmailConfirmationLink(User user, string returnUrl)
