@@ -155,6 +155,11 @@ namespace IdentityServerHost.Quickstart.UI
                 {
                     await HandleLockOut(model.Username, model.ReturnUrl);
                 }
+                if (result.RequiresTwoFactor)
+                {
+                    return RedirectToAction(nameof(LoginTwoStep),
+                        new { Email = model.Username, model.RememberLogin, model.ReturnUrl });
+                }
                 else
                 {
                     await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId: context?.Client.ClientId));
@@ -370,6 +375,54 @@ namespace IdentityServerHost.Quickstart.UI
         {
             ViewData["ReturnUrl"] = returnUrl;
             return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> LoginTwoStep(string email, bool rememberLogin, string returnUrl)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return RedirectToAction(nameof(Error), new { returnUrl });
+
+            var providers = await _userManager.GetValidTwoFactorProvidersAsync(user);
+            if(!providers.Contains("Email"))
+                return RedirectToAction(nameof(Error), new { returnUrl });
+
+            var token = await _userManager.GenerateTwoFactorTokenAsync(user, "Email");
+
+            var message = new Message(new string[] { email }, "Authentication token", token, null);
+            await _emailSender.SendEmailAsync(message);
+            ViewData["RouteData"] = new Dictionary<string, string>
+            {
+                {"returnUrl", returnUrl },
+                {"email", email }
+            };
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LoginTwoStep(TwoStepModel twoStepModel, string returnUrl,
+            string email)
+        {
+            if(!ModelState.IsValid)
+                return View(twoStepModel);
+
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            if (user == null)
+                return RedirectToAction(nameof(Error), new { returnUrl });
+
+            var result = await _signInManager.TwoFactorSignInAsync("Email",
+                twoStepModel.TwoFactorCode, twoStepModel.RememberLogin, rememberClient: false);
+            if (result.Succeeded)
+                return this.LoadingPage("Redirect", returnUrl);
+            else if (result.IsLockedOut)
+            {
+                await HandleLockOut(email, returnUrl);
+                return View(twoStepModel);
+            }
+            else
+                return RedirectToAction(nameof(Error), new { returnUrl });
         }
         /*****************************************/
         /* helper APIs for the AccountController */
