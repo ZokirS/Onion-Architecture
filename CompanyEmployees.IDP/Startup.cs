@@ -62,6 +62,7 @@ namespace CompanyEmployees.IDP
                 .AddDefaultTokenProviders()
                 .AddTokenProvider<EmailConfirmationTokenProvider<User>>("emailconfirmation");
 
+            
             var builder = services.AddIdentityServer(options =>
             {
                 // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
@@ -80,7 +81,6 @@ namespace CompanyEmployees.IDP
                     sql => sql.MigrationsAssembly(migrationAssembly));
                 })
                 .AddAspNetIdentity<User>();
-
             // not recommended for production - you need to store your key material somewhere secure
             builder.AddDeveloperSigningCredential();
 
@@ -89,6 +89,13 @@ namespace CompanyEmployees.IDP
 
             services.Configure<EmailConfirmationTokenProviderOptions>(opt=>
             opt.TokenLifespan = TimeSpan.FromDays(3));
+
+            services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    options.ClientId = "1021324711644-dc17i0sbq62l3sj4utd5ngh46ol03qfs.apps.googleusercontent.com";
+                    options.ClientSecret = "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";
+                });
         }
 
         public void Configure(IApplicationBuilder app)
