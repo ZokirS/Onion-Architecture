@@ -93,8 +93,8 @@ namespace CompanyEmployees.IDP
             services.AddAuthentication()
                 .AddGoogle(options =>
                 {
-                    options.ClientId = "1021324711644-dc17i0sbq62l3sj4utd5ngh46ol03qfs.apps.googleusercontent.com";
-                    options.ClientSecret = "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";
+                    options.ClientId = "****";
+                    options.ClientSecret = "***";
                 });
         }
 
