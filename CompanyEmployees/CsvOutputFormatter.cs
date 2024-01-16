@@ -13,13 +13,17 @@ namespace CompanyEmployees
             SupportedEncodings.Add(Encoding.UTF8);
             SupportedEncodings.Add(Encoding.Unicode);
         }
+        public CsvOutputFormatter(string s)
+        {
+            
+        }
         protected override bool CanWriteType(Type? type)
         {
             if(typeof(CompanyDto).IsAssignableFrom(type) ||
                 typeof(IEnumerable<CompanyDto>).IsAssignableFrom(type))
             {
                 return base.CanWriteType(type);
-            }
+            } 
             return false;
         }
         public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
